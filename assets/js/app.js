@@ -91,7 +91,7 @@ function makeResponsive() {
 
         chartGroup.call(toolTip);
 
-        circlesGroup.on("mouseover", data => {
+        circlesPair.on("mouseover", data => {
             toolTip.show(data, this);
         }).on("mouseout", data => {
             toolTip.hide(data);
