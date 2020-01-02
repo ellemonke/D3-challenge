@@ -1,109 +1,106 @@
-// Chart Size
-// var svgWidth = 780;
-// var svgHeight = 540;
-var svgWidth = window.innerWidth * 0.6;
-var svgHeight = window.innerHeight * 0.8;
+function makeResponsive() {
 
-var margin = {
-    top: 25,
-    right: 20, 
-    bottom: 180,
-    left: 55
-}
+    // Reset chart at beginning of each new window (resize)
+    var svgArea = d3.select("body").select("svg");
 
-var width = svgWidth - margin.left - margin.right;
-var height = svgHeight - margin.top - margin.bottom;
+    if (!svgArea.empty()) {
+      svgArea.remove();
+    }
 
-// SVG Wrapper
-var svg = d3.select("#scatter")
-    .append("svg")
-    .attr("width", svgWidth)
-    .attr("height", svgHeight);
+    // Chart Size
+    var svgWidth = window.innerWidth * 0.6;
+    var svgHeight = window.innerHeight * 0.8;
 
-// Chart Group
-var chartGroup = svg.append("g")
-    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+    var margin = {
+        top: 25,
+        right: 20, 
+        bottom: 180,
+        left: 55
+    }
 
-// Initial Axes Parameters
-var chosenXAxis = "poverty";
-var chosenYAxis = "healthcare";
+    var width = svgWidth - margin.left - margin.right;
+    var height = svgHeight - margin.top - margin.bottom;
 
-// Function to render new xScale upon event
-function xScale(healthData, chosenXAxis) {
+    // SVG Wrapper
+    var svg = d3.select("#scatter")
+        .append("svg")
+        .attr("width", svgWidth)
+        .attr("height", svgHeight);
 
-    var xLinearScale = d3.scaleLinear()
-        .domain(d3.extent(healthData, d => d[chosenXAxis]))
-        .range([0, width]);    
+    // Chart Group
+    var chartGroup = svg.append("g")
+        .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    return xLinearScale;
-};
+    // Initial Axes Parameters
+    var chosenXAxis = "poverty";
+    var chosenYAxis = "healthcare";
 
-// Function to render new xAxis upon event
-function renderXAxis(newXScale, xAxis) {
+    // Function to render new xScale upon event
+    function xScale(healthData, chosenXAxis) {
 
-    var bottomAxis = d3.axisBottom(newXScale);
+        var xLinearScale = d3.scaleLinear()
+            .domain(d3.extent(healthData, d => d[chosenXAxis]))
+            .range([0, width]);    
 
-    xAxis.transition()
-      .duration(1000)
-      .call(bottomAxis);
-
-    return xAxis;
-};
-
-// Function to render new Circles upon event
-function renderCircles(circlesPair, newXScale, chosenXaxis) {
-
-    circlesPair.selectAll("circle")
-        .transition()
-        .duration(1000)
-        .attr("cx", d => newXScale(d[chosenXAxis]));
-
-    circlesPair.selectAll("text")
-        .transition()
-        .duration(1000)
-        .attr("x", d => newXScale(d[chosenXAxis]));
-
-    return circlesPair;
-};
-
-// Function to render new Tool Tips upon event
-function updateToolTip(chosenXAxis, circlesPair) {
-
-    if (chosenXAxis === "poverty") {
-        var label = "Poverty (%):";
-    } else if (chosenXAxis === "age") {
-        var label = "Age (Median):";
-    } else {
-        var label = "Income (Median):";
+        return xLinearScale;
     };
-    
-    var toolTip = d3.tip()
-        .attr("class", "d3-tip")
-        .offset([40, -70])
-        .html(d => {
-            return (`${d.state}<br>${label} ${d[chosenXAxis]}<br>Health Care (%): ${d.healthcare}`);
+
+    // Function to render new xAxis upon event
+    function renderXAxis(newXScale, xAxis) {
+
+        var bottomAxis = d3.axisBottom(newXScale);
+
+        xAxis.transition()
+        .duration(1000)
+        .call(bottomAxis);
+
+        return xAxis;
+    };
+
+    // Function to render new Circles upon event
+    function renderCircles(circlesPair, newXScale, chosenXaxis) {
+
+        circlesPair.selectAll("circle")
+            .transition()
+            .duration(1000)
+            .attr("cx", d => newXScale(d[chosenXAxis]));
+
+        circlesPair.selectAll("text")
+            .transition()
+            .duration(1000)
+            .attr("x", d => newXScale(d[chosenXAxis]));
+
+        return circlesPair;
+    };
+
+    // Function to render new Tool Tips upon event
+    function updateToolTip(chosenXAxis, circlesPair) {
+
+        if (chosenXAxis === "poverty") {
+            var label = "Poverty (%):";
+        } else if (chosenXAxis === "age") {
+            var label = "Age (Median):";
+        } else {
+            var label = "Income ($):";
+        };
+        
+        var toolTip = d3.tip()
+            .attr("class", "d3-tip")
+            .offset([40, -70])
+            .html(d => {
+                return (`${d.state}<br>${label} ${d[chosenXAxis]}<br>Health Care (%): ${d.healthcare}`);
+            });
+
+        chartGroup.call(toolTip);
+
+        circlesPair.on("mouseover", data => {
+            toolTip.show(data, this);
+        }).on("mouseout", data => {
+            toolTip.hide(data);
         });
 
-    chartGroup.call(toolTip);
-
-    circlesPair.on("mouseover", data => {
-        toolTip.show(data, this);
-    }).on("mouseout", data => {
-        toolTip.hide(data);
-    });
-
-    return circlesPair;
-};
-
-
-// function makeResponsive() {
-
-    // // Reset chart at beginning of each new window (resize)
-    // var svgArea = d3.select("body").select("svg");
-
-    // if (!svgArea.empty()) {
-    //   svgArea.remove();
-    // }
+        return circlesPair;
+    };
 
     // Import Data    
     d3.csv("assets/data/data.csv").then((healthData, err) => {
@@ -141,13 +138,13 @@ function updateToolTip(chosenXAxis, circlesPair) {
             .call(leftAxis);
 
         // Create Initial Data Circles
-        // Wrap each circle and text in a group
+        // Wrap each circle and text in a pair group
         var circlesPair = chartGroup.selectAll("circle")
             .data(healthData)
             .enter()
             .append("g");
 
-        var circlesGroup = circlesPair.append("circle")
+        circlesPair.append("circle")
             .attr("cx", d => xLinearScale(d[chosenXAxis]))
             .attr("cy", d => yScale(d.healthcare))
             .attr("r", "10")
@@ -255,9 +252,9 @@ function updateToolTip(chosenXAxis, circlesPair) {
     }).catch(function(error) {
         console.log(error);
     });
-// };
+};
 
-// makeResponsive();
+makeResponsive();
 
-// // Event listener for window resize.
-// d3.select(window).on("resize", makeResponsive);
+// Event listener for window resize.
+d3.select(window).on("resize", makeResponsive);
