@@ -14,8 +14,7 @@ function makeResponsive() {
     var margin = {
         top: 25,
         right: 20, 
-        bottom: 180,
-        // left: 55
+        bottom: 140,
         left: 100
     }
 
@@ -93,7 +92,7 @@ function makeResponsive() {
             .transition()
             .duration(1000)
             .attr("x", d => newXScale(d[chosenXAxis]))
-            .attr("y", d => newYScale(d[chosenYAxis]));
+            .attr("y", d => newYScale(d[chosenYAxis] - 0.2));
 
         return circlesPair;
     };
@@ -196,19 +195,19 @@ function makeResponsive() {
             .attr("class", "aText");
 
         var povertyXLabel = xLabelsGroup.append("text")
-            .attr("y", 20)
+            .attr("y", 0)
             .attr("value", "poverty")
             .classed("active", true)
             .text("In Poverty (%)");
 
         var ageXLabel = xLabelsGroup.append("text")
-            .attr("y", 40)
+            .attr("y", 20)
             .attr("value", "age")
             .classed("inactive", true)
             .text("Age (Median)");
 
         var incomeXLabel = xLabelsGroup.append("text")
-            .attr("y", 60)
+            .attr("y", 40)
             .attr("value", "income")
             .classed("inactive", true)
             .text("Household Income (Median)");
@@ -220,21 +219,21 @@ function makeResponsive() {
     
         var healthcareYLabel = yLabelsGroup.append("text")
             .attr("x", `-${height/2}`)
-            .attr("y", -30)
+            .attr("y", -40)
             .attr("value", "healthcare")
             .classed("active", true)
             .text("Lacks Healthcare (%)");
 
         var obesityYLabel = yLabelsGroup.append("text")
             .attr("x", `-${height/2}`)
-            .attr("y", -50)
+            .attr("y", -60)
             .attr("value", "obesity")
             .classed("inactive", true)
             .text("Obese (%)");
 
         var smokesYLabel = yLabelsGroup.append("text")
             .attr("x", `-${height/2}`)
-            .attr("y", -70)
+            .attr("y", -80)
             .attr("value", "smokes")
             .classed("inactive", true)
             .text("Smokes (%)");
